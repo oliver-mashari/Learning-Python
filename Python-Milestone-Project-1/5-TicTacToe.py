@@ -1,22 +1,14 @@
-# Imports
 from IPython.display import clear_output
-import random 
+import random
 
-"""
-Step 1: Write a function that can print out a board. Set up your board as a list, 
-where each index 1-9 corresponds with a number on a number pad, 
-so you get a 3 by 3 board representation.
-"""
+# Function to display board
 def display_board(board):
     clear_output()
     print(board[7]+'|'+board[8]+'|'+board[9])
     print(board[4]+'|'+board[5]+'|'+board[6])
     print(board[1]+'|'+board[2]+'|'+board[3])
 
-"""
-Step 2: Write a function that can take in a player input and assign their marker as 'X' or 'O'. 
-Think about using while loops to continually ask until you get a correct answer.
-"""
+# Ask player one which marker they would prefer to use
 def player_input():
     player_marker = ''
     while player_marker != 'X' and player_marker != 'O':
@@ -31,16 +23,11 @@ def player_input():
         player2 = 'X'
     return (player1, player2)
 
-"""
-Step 3: Write a function that takes in the board list object, a marker ('X' or 'O')
-and a desired position (number 1-9) and assigns it to the board.
-"""
+# Place marker on board
 def place_marker(board, marker, position):
     board[position] = marker
 
-"""
-Step 4: Write a function that takes in a board and a mark (X or O) and then checks to see if that mark has won.
-"""
+# Win conditions
 def win_check(board, mark):
     # Check rows
     if ((board[7] == mark and board[8] == mark and board[9] == mark) or
@@ -57,33 +44,25 @@ def win_check(board, mark):
         (board[3] == mark and board[5] == mark and board[7] == mark)):
         return True
 
-"""
-Step 5: Write a function that uses the random module to randomly decide which player goes first. 
-You may want to lookup random.randint() Return a string of which player went first.
-"""
+# Randomly select which player moves first 
 def choose_first():
-    decision = random.randit(1,2)
+    decision = random.randint(1,2)
     if decision == 1:
-        return 'Player 1'
+        return 'Player one'
     else:
-        return 'Player 2'
+        return 'Player two'
 
-"""
-Step 6: Write a function that returns a boolean indicating whether a space on the board is freely available.
-"""
+# Check if space on board is occupied
 def space_check(board, position):
-    avaliability = False
-    while avaliability == False:
-        if board[position] == 'X' or board[position] == 'O':
-            "Space not avaliable"
-        else:
-            avaliability = True
+    if board[position] == 'X' or board[position] == 'O':
+        return False
+    else:
+        return True
 
-"""
-Step 7: Write a function that checks if the board is full and returns a boolean value. True if full, False otherwise.
-"""
+# Check full board to determine if any more moves can be made 
+# if not game ends in a tie
 def full_board_check(board):
-    for i in range(len(1,board)):
+    for i in range(1,len(board)):
         if board[i] == 'X' or board[i] == 'O':
             continue
         else:
@@ -91,31 +70,100 @@ def full_board_check(board):
     print("Board is full")
     return True
 
-"""
-Step 8: Write a function that asks for a player's next position (as a number 1-9) and then uses the function 
-from step 6 to check if it's a free position. If it is, then return the position for later use.
-"""
+# Ask player where they want to place marker
 def player_choice(board):
-    # Variables 
-    # Initial choice 
-    choice = "No"
+    # Variables
+    position = "No"
     acceptable_range = range(1,9)
     within_range = False
+    space = False
 
-    # Two conditions to check 
-    # Digit or within range == False 
-    while choice.isdigit() == False or within_range == False:
-        choice = input("Please enter a number 0-9: ")
+    while position.isdigit() is False or within_range is False or space is False:
+        position = input("Please enter a number 1-9: ")
         # Digit check 
-        if choice.isdigit() == False:
+        if position.isdigit() == False:
             print("Sorry this is not a digit")
-        # range check 
-        if choice.isdigit() == True:
-            if int(choice) in acceptable_range:
+        # Range check 
+        elif position.isdigit() == True:
+            if int(position) in acceptable_range:
+                # Check if space is occupied
+                if space_check(board, int(position)) == False:
+                    print("Space not avaliable")
+                    space = False
+                else:
+                    space = True
                 within_range = True
             else:
                 print("Sorry outwith range")
-                within_range = False 
-   
-    space_check(board,choice)
+                within_range = False
+    return int(position)
 
+def replay():
+    choice = ''
+    while choice == 'Y' or choice == 'N':
+        choice = input("Would you like to play again? (Y or N): ").upper()
+        if choice == 'Y':
+            return True
+        else:
+            return False
+
+print('Welcome to Tic Tac Toe!')
+
+while True:
+    game_board = [' ']*10
+    marker_p1, marker_p2 = player_input()
+    player = choose_first()
+    if player == 'Player one':
+        print(f"{player} will make the first move playing as {marker_p1}")
+    elif player == 'Player two':
+        print(f"{player} will make the first move playing as {marker_p2}")
+    start_game = input("Are you ready to play? (Y or N): ").upper()
+    if start_game == 'Y':
+        start_game = True 
+    else:
+        start_game = False
+        
+        
+    while start_game is True:
+        #Player 1 Turn
+        if player == 'Player one':
+            display_board(game_board)
+            print(" ")
+            print(" ")
+            position = player_choice(game_board)
+            place_marker(game_board, marker_p1, position)
+            
+            if win_check(game_board, marker_p1) == True:
+                display_board(game_board)
+                print(f"Congratulations {player}")
+                start_game = False
+            else:
+                if full_board_check(game_board) == True:
+                    display_board(game_board)
+                    print("the game is a draw")
+                    break
+                else: 
+                    player = 'Player two'
+                
+        # Player2's turn.
+        else:
+            display_board(game_board)
+            print(" ")
+            print(" ")
+            position = player_choice(game_board)
+            place_marker(game_board, marker_p2,position)
+            
+            if win_check(game_board, marker_p2) == True:
+                display_board(game_board)
+                print(f"Congratulations {player}")
+                start_game = False
+            else:
+                if full_board_check(game_board) == True:
+                    display_board(game_board)
+                    print("the game is a draw")
+                    break
+                else: 
+                    player = 'Player one'
+
+    if not replay():
+        break
