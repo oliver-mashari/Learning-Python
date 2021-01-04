@@ -23,6 +23,6 @@ class Dog(Animal):
         print("Woof!")
 
 my_dog = Dog()
-my_dog.who_am_i()
+# my_dog.who_am_i()
 
 # Polymorphism
